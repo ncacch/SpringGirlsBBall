@@ -1,3 +1,4 @@
+// ---------- Visible error banners (helps debugging on mobile) ----------
 window.addEventListener("error", (e) => {
   document.body.insertAdjacentHTML(
     "afterbegin",
@@ -15,6 +16,8 @@ window.addEventListener("unhandledrejection", (e) => {
     </div>`
   );
 });
+
+// ---------- Helpers ----------
 async function loadJson(path) {
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
@@ -22,10 +25,10 @@ async function loadJson(path) {
 }
 
 function computeStandings(teams, games) {
-  const standings = new Map();
+  const map = new Map();
 
   for (const t of teams) {
-    standings.set(t.id, {
+    map.set(t.id, {
       teamId: t.id,
       name: t.name,
       wins: 0,
@@ -39,12 +42,15 @@ function computeStandings(teams, games) {
     const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
     if (!played) continue;
 
-    const home = standings.get(g.homeTeamId);
-    const away = standings.get(g.awayTeamId);
+    const home = map.get(g.homeTeamId);
+    const away = map.get(g.awayTeamId);
+
+    // If a game references an unknown teamId, skip it (prevents crashing)
     if (!home || !away) continue;
 
     home.pf += g.homeScore;
     home.pa += g.awayScore;
+
     away.pf += g.awayScore;
     away.pa += g.homeScore;
 
@@ -55,21 +61,32 @@ function computeStandings(teams, games) {
       away.wins += 1;
       home.losses += 1;
     }
+    // (If you need ties, tell me and I’ll add a T column + logic.)
   }
 
-  return [...standings.values()].sort((a, b) => {
+  const rows = [...map.values()];
+  rows.sort((a, b) => {
     const diffA = a.pf - a.pa;
     const diffB = b.pf - b.pa;
-    return (b.wins - a.wins) || (diffB - diffA) || (b.pf - a.pf) || a.name.localeCompare(b.name);
+    return (
+      b.wins - a.wins ||
+      diffB - diffA ||
+      b.pf - a.pf ||
+      a.name.localeCompare(b.name)
+    );
   });
+
+  return rows;
 }
 
 function renderStandings(rows) {
   const tbody = document.querySelector("#standingsTable tbody");
+  if (!tbody) throw new Error("Standings table body not found (#standingsTable tbody).");
+
   tbody.innerHTML = "";
   for (const r of rows) {
-    const tr = document.createElement("tr");
     const diff = r.pf - r.pa;
+    const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.name}</td>
       <td>${r.wins}</td>
@@ -84,6 +101,8 @@ function renderStandings(rows) {
 
 function renderSchedule(teamsById, games) {
   const el = document.getElementById("schedule");
+  if (!el) throw new Error("Schedule container not found (#schedule).");
+
   el.innerHTML = "";
 
   const sorted = [...games].sort((a, b) => {
@@ -97,42 +116,30 @@ function renderSchedule(teamsById, games) {
     const awayName = teamsById.get(g.awayTeamId) || g.awayTeamId || "TBD";
 
     const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
-    const scoreLine = played
+
+    const line = played
       ? `${awayName} ${g.awayScore} — ${homeName} ${g.homeScore}`
       : `${awayName} @ ${homeName}`;
 
     const metaParts = [
-      g.location ? g.location : null,
-      g.date ? g.date : null,
-      g.time ? g.time : null
+      g.location || null,
+      g.date || null,
+      g.time || null
     ].filter(Boolean);
 
     const div = document.createElement("div");
     div.className = "game";
     div.innerHTML = `
       <div class="meta">${metaParts.join(" • ")}</div>
-      <div class="score">${scoreLine}</div>
+      <div class="score">${line}</div>
       ${played ? "" : `<div class="pending">Not played yet</div>`}
     `;
+
     el.appendChild(div);
   }
 }
 
-async function main() {
-  const [teams, games] = await Promise.all([
-    loadJson("teams.json"),
-    loadJson("games.json")
-  ]);
-
-  const teamsById = new Map(teams.map(t => [t.id, t.name]));
-  const standings = computeStandings(teams, games);
-
-  renderStandings(standings);
-  renderSchedule(teamsById, games);
-}
-
 function seedFromStandings(standings) {
-  // standings already sorted best-to-worst
   return standings.map((t, idx) => ({
     seed: idx + 1,
     teamId: t.teamId,
@@ -144,17 +151,21 @@ function seedFromStandings(standings) {
     diff: t.pf - t.pa
   }));
 }
+
 function renderPlayoffs(seeds) {
   const el = document.getElementById("playoffs");
-  if (!el) return;
+  if (!el) return; // if you remove playoffs section from HTML, don’t crash
 
-  // Basic safety
   if (!seeds || seeds.length < 6) {
-    el.innerHTML = `<div class="game"><div class="pending">Playoffs will appear once all 6 teams are loaded.</div></div>`;
+    el.innerHTML = `
+      <div class="game">
+        <div class="pending">Playoffs will appear once 6 teams are loaded.</div>
+      </div>
+    `;
     return;
   }
 
-  const s = (n) => seeds[n - 1]; // seed lookup: s(1) is seed #1 team object
+  const s = (n) => seeds[n - 1];
 
   el.innerHTML = `
     <div class="game">
@@ -165,7 +176,7 @@ function renderPlayoffs(seeds) {
     </div>
 
     <div class="game">
-      <div class="meta">Friday Night — Play-in</div>
+      <div class="meta">Friday Night — Play-in (Tentative)</div>
       <div class="score">Game A: #3 ${s(3).name} vs #6 ${s(6).name}</div>
       <div class="score">Game B: #4 ${s(4).name} vs #5 ${s(5).name}</div>
     </div>
@@ -182,12 +193,22 @@ function renderPlayoffs(seeds) {
     </div>
   `;
 }
+
+// ---------- Main ----------
+async function main() {
+  const [teams, games] = await Promise.all([
+    loadJson("teams.json"),
+    loadJson("games.json")
+  ]);
+
+  const teamsById = new Map(teams.map(t => [t.id, t.name]));
+  const standings = computeStandings(teams, games);
+
   renderStandings(standings);
   renderSchedule(teamsById, games);
 
   const seeds = seedFromStandings(standings);
   renderPlayoffs(seeds);
-main().catch(err => {
-  console.error(err);
-  alert("Error loading league data. Check console for details.");
-});
+}
+
+main();
