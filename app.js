@@ -1,3 +1,20 @@
+window.addEventListener("error", (e) => {
+  document.body.insertAdjacentHTML(
+    "afterbegin",
+    `<div style="background:#ffe0e0;color:#900;padding:10px;font-weight:700">
+      JS Error: ${String(e.message || e.error || e)}
+    </div>`
+  );
+});
+
+window.addEventListener("unhandledrejection", (e) => {
+  document.body.insertAdjacentHTML(
+    "afterbegin",
+    `<div style="background:#ffe0e0;color:#900;padding:10px;font-weight:700">
+      Promise Error: ${String(e.reason || e)}
+    </div>`
+  );
+});
 async function loadJson(path) {
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
