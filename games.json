@@ -1,8 +1,21 @@
 [
-  { "id": "fusion", "name": "Millcreek Fusion" },
-  { "id": "wk", "name": "Wattsburg-Kinzig" },
-  { "id": "wj", "name": "Wattsburg-Jefferson" },
-  { "id": "girard", "name": "Girard" },
-  { "id": "nw", "name": "Northwestern" },
-  { "id": "iroquois", "name": "Iroquois" }
+  { "id": 1, "date": "2026-03-21", "time": "10:00 AM", "location": "Iroquois", "homeTeamId": "iroquois", "awayTeamId": "fusion", "homeScore": null, "awayScore": null },
+  { "id": 2, "date": "2026-03-21", "time": "11:00 AM", "location": "Iroquois", "homeTeamId": "girard", "awayTeamId": "wk", "homeScore": null, "awayScore": null },
+  { "id": 3, "date": "2026-03-21", "time": "12:00 PM", "location": "Iroquois", "homeTeamId": "nw", "awayTeamId": "wj", "homeScore": null, "awayScore": null },
+
+  { "id": 4, "date": "2026-03-28", "time": "1:00 PM", "location": "Millcreek / Church of the Cross", "homeTeamId": "girard", "awayTeamId": "iroquois", "homeScore": null, "awayScore": null },
+  { "id": 5, "date": "2026-03-28", "time": "2:00 PM", "location": "Millcreek / Church of the Cross", "homeTeamId": "fusion", "awayTeamId": "wj", "homeScore": null, "awayScore": null },
+  { "id": 6, "date": "2026-03-28", "time": "3:00 PM", "location": "Millcreek / Church of the Cross", "homeTeamId": "nw", "awayTeamId": "wk", "homeScore": null, "awayScore": null },
+
+  { "id": 7, "date": "2026-04-11", "time": "10:00 AM", "location": "Northwestern", "homeTeamId": "girard", "awayTeamId": "fusion", "homeScore": null, "awayScore": null },
+  { "id": 8, "date": "2026-04-11", "time": "11:00 AM", "location": "Northwestern", "homeTeamId": "iroquois", "awayTeamId": "nw", "homeScore": null, "awayScore": null },
+  { "id": 9, "date": "2026-04-11", "time": "12:00 PM", "location": "Northwestern", "homeTeamId": "wj", "awayTeamId": "wk", "homeScore": null, "awayScore": null },
+
+  { "id": 10, "date": "2026-04-18", "time": "10:00 AM", "location": "Wattsburg", "homeTeamId": "nw", "awayTeamId": "fusion", "homeScore": null, "awayScore": null },
+  { "id": 11, "date": "2026-04-18", "time": "11:00 AM", "location": "Wattsburg", "homeTeamId": "nw", "awayTeamId": "girard", "homeScore": null, "awayScore": null },
+  { "id": 12, "date": "2026-04-18", "time": "12:00 PM", "location": "Wattsburg", "homeTeamId": "iroquois", "awayTeamId": "wj", "homeScore": null, "awayScore": null },
+
+  { "id": 13, "date": "2026-04-25", "time": "10:00 AM", "location": "TBD", "homeTeamId": "wk", "awayTeamId": "fusion", "homeScore": null, "awayScore": null },
+  { "id": 14, "date": "2026-04-25", "time": "11:00 AM", "location": "TBD", "homeTeamId": "wk", "awayTeamId": "iroquois", "homeScore": null, "awayScore": null },
+  { "id": 15, "date": "2026-04-25", "time": "12:00 PM", "location": "TBD", "homeTeamId": "girard", "awayTeamId": "wj", "homeScore": null, "awayScore": null }
 ]
