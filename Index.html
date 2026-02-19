@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Basketball League Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Basketball League</h1>
+    <p>Schedule • Scores • Standings</p>
+  </header>
+
+  <main class="grid">
+    <section>
+      <h2>Standings</h2>
+      <table id="standingsTable">
+        <thead>
+          <tr>
+            <th>Team</th><th>W</th><th>L</th><th>PF</th><th>PA</th><th>Diff</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Schedule & Scores</h2>
+      <div id="schedule"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
