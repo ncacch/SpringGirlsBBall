@@ -1,0 +1,8 @@
+[
+  { "id": "fusion", "name": "Millcreek Fusion" },
+  { "id": "wk", "name": "Wattsburg-Kinzig" },
+  { "id": "wj", "name": "Wattsburg-Jefferson" },
+  { "id": "girard", "name": "Girard" },
+  { "id": "nw", "name": "Northwestern" },
+  { "id": "iroquois", "name": "Iroquois" }
+]
