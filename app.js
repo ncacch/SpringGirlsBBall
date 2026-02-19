@@ -114,6 +114,62 @@ async function main() {
   renderSchedule(teamsById, games);
 }
 
+function seedFromStandings(standings) {
+  // standings already sorted best-to-worst
+  return standings.map((t, idx) => ({
+    seed: idx + 1,
+    teamId: t.teamId,
+    name: t.name,
+    wins: t.wins,
+    losses: t.losses,
+    pf: t.pf,
+    pa: t.pa,
+    diff: t.pf - t.pa
+  }));
+}
+function renderPlayoffs(seeds) {
+  const el = document.getElementById("playoffs");
+  if (!el) return;
+
+  // Basic safety
+  if (!seeds || seeds.length < 6) {
+    el.innerHTML = `<div class="game"><div class="pending">Playoffs will appear once all 6 teams are loaded.</div></div>`;
+    return;
+  }
+
+  const s = (n) => seeds[n - 1]; // seed lookup: s(1) is seed #1 team object
+
+  el.innerHTML = `
+    <div class="game">
+      <div class="meta">Seeding (based on current standings)</div>
+      <div class="score">
+        ${seeds.map(x => `#${x.seed} ${x.name}`).join("<br/>")}
+      </div>
+    </div>
+
+    <div class="game">
+      <div class="meta">Friday Night — Play-in</div>
+      <div class="score">Game A: #3 ${s(3).name} vs #6 ${s(6).name}</div>
+      <div class="score">Game B: #4 ${s(4).name} vs #5 ${s(5).name}</div>
+    </div>
+
+    <div class="game">
+      <div class="meta">Saturday — Semifinals (10:30 AM)</div>
+      <div class="score">Semi 1: Winner of #4/#5 vs #1 ${s(1).name}</div>
+      <div class="score">Semi 2: Winner of #3/#6 vs #2 ${s(2).name}</div>
+    </div>
+
+    <div class="game">
+      <div class="meta">Saturday — Championship (12:00 PM)</div>
+      <div class="score">Championship: Winners of the 10:30 AM semifinals</div>
+    </div>
+  `;
+}
+  renderStandings(standings);
+  renderSchedule(teamsById, games);
+
+  const seeds = seedFromStandings(standings);
+  renderPlayoffs(seeds);
 main().catch(err => {
   console.error(err);
   alert("Error loading league data. Check console for details.");
