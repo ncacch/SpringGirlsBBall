@@ -1,0 +1,14 @@
+body { font-family: system-ui, Arial, sans-serif; margin: 0; padding: 0; }
+header { padding: 16px; border-bottom: 1px solid #ddd; }
+main { padding: 16px; }
+.grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+th { background: #fafafa; }
+
+.game { border: 1px solid #eee; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+.meta { color: #666; font-size: 0.9em; margin-bottom: 6px; }
+.score { font-weight: 600; }
+.pending { color: #888; font-style: italic; }
