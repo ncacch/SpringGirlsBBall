@@ -155,7 +155,11 @@ function seedFromStandings(standings) {
 function renderPlayoffs(seeds) {
   const el = document.getElementById("playoffs");
   if (!el) return; // if you remove playoffs section from HTML, don’t crash
-
+const datesEl = document.getElementById("playoffDates");
+  if (datesEl) {
+    datesEl.textContent =
+      "Friday 5/1/26 (Play-in Games) • Saturday 5/2/26 — Semifinals 10:30 AM • Championship 12:00 PM";
+  }
   if (!seeds || seeds.length < 6) {
     el.innerHTML = `
       <div class="game">
