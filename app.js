@@ -131,15 +131,16 @@ function renderSchedule(teamsById, games) {
     header.style.marginTop = "24px";
     el.appendChild(header);
 
-    // Show site once if consistent
-    const sites = new Set(weekGames.map(g => g.location).filter(Boolean));
-    if (sites.size === 1) {
-      const siteLine = document.createElement("div");
-      siteLine.className = "meta";
-      siteLine.textContent = [...sites][0];
-      siteLine.style.marginBottom = "8px";
-      el.appendChild(siteLine);
-    }
+// Show site once if consistent (BOLD + LARGE)
+const sites = new Set(weekGames.map(g => g.location).filter(Boolean));
+if (sites.size === 1) {
+  const siteLine = document.createElement("div");
+  siteLine.textContent = [...sites][0];
+  siteLine.style.fontWeight = "700";
+  siteLine.style.fontSize = "1.15rem";
+  siteLine.style.marginBottom = "10px";
+  el.appendChild(siteLine);
+}
 
     // Games
     for (const g of weekGames) {
