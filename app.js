@@ -19,6 +19,11 @@ window.addEventListener("unhandledrejection", (e) => {
 
 // ---------- Helpers ----------
 async function loadJson(path) {
+  function teamBadge(teamId, teamName) {
+  const safeName = String(teamName ?? teamId ?? "TBD");
+  const safeId = String(teamId ?? "tbd");
+  return `<span class="team-badge team-${safeId}">${safeName}</span>`;
+}
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
   return res.json();
@@ -90,7 +95,7 @@ function renderStandings(rows) {
     const diff = r.pf - r.pa;
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${r.name}</td>
+      <td>${teamBadge(r.teamId, r.name)}</td>
       <td>${r.wins}</td>
       <td>${r.losses}</td>
       <td>${r.pf}</td>
@@ -148,9 +153,12 @@ if (sites.size === 1) {
       const awayName = teamsById.get(g.awayTeamId) || g.awayTeamId || "TBD";
       const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
 
-      const line = played
-        ? `${awayName} ${g.awayScore} — ${homeName} ${g.homeScore}`
-        : `${awayName} @ ${homeName}`;
+     const awayBadge = teamBadge(g.awayTeamId, awayName);
+const homeBadge = teamBadge(g.homeTeamId, homeName);
+
+const line = played
+  ? `${awayBadge} ${g.awayScore} — ${homeBadge} ${g.homeScore}`
+  : `${awayBadge} @ ${homeBadge}`;
 
       const div = document.createElement("div");
       div.className = "game";
