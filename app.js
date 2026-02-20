@@ -19,14 +19,15 @@ window.addEventListener("unhandledrejection", (e) => {
 
 // ---------- Helpers ----------
 async function loadJson(path) {
-  function teamBadge(teamId, teamName) {
-  const safeName = String(teamName ?? teamId ?? "TBD");
-  const safeId = String(teamId ?? "tbd");
-  return `<span class="team-badge team-${safeId}">${safeName}</span>`;
-}
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
   return res.json();
+}
+
+function teamBadge(teamId, teamName) {
+  const safeName = String(teamName ?? teamId ?? "TBD");
+  const safeId = String(teamId ?? "tbd");
+  return `<span class="team-badge team-${safeId}">${safeName}</span>`;
 }
 
 function computeStandings(teams, games) {
