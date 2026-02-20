@@ -27,6 +27,7 @@ async function loadJson(path) {
 function computeStandings(teams, games) {
   const map = new Map();
 
+  // Initialize every team
   for (const t of teams) {
     map.set(t.id, {
       teamId: t.id,
@@ -38,6 +39,7 @@ function computeStandings(teams, games) {
     });
   }
 
+  // Apply completed games
   for (const g of games) {
     const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
     if (!played) continue;
@@ -61,9 +63,9 @@ function computeStandings(teams, games) {
       away.wins += 1;
       home.losses += 1;
     }
-    // (If you need ties, tell me and I’ll add a T column + logic.)
   }
 
+  // Sort: wins desc, diff desc, PF desc, name asc
   const rows = [...map.values()];
   rows.sort((a, b) => {
     const diffA = a.pf - a.pa;
@@ -98,40 +100,38 @@ function renderStandings(rows) {
     tbody.appendChild(tr);
   }
 }
+
+// ---------- Schedule (grouped by week/date) ----------
 function renderSchedule(teamsById, games) {
   const el = document.getElementById("schedule");
   if (!el) throw new Error("Schedule container not found (#schedule).");
 
   el.innerHTML = "";
 
-  // Sort games by date then time
+  // Sort by date then time
   const sorted = [...games].sort((a, b) => {
     const da = new Date(`${a.date}T00:00:00`);
     const db = new Date(`${b.date}T00:00:00`);
     return da - db || String(a.time).localeCompare(String(b.time));
   });
 
-  // Group games by date
-  const gamesByDate = {};
+  // Group by date
+  const gamesByDate = new Map();
   for (const g of sorted) {
-    if (!gamesByDate[g.date]) {
-      gamesByDate[g.date] = [];
-    }
-    gamesByDate[g.date].push(g);
+    if (!gamesByDate.has(g.date)) gamesByDate.set(g.date, []);
+    gamesByDate.get(g.date).push(g);
   }
 
   let weekNumber = 1;
 
-  for (const date of Object.keys(gamesByDate)) {
-    const weekGames = gamesByDate[date];
+  for (const [date, weekGames] of gamesByDate.entries()) {
+    // Week header
+    const header = document.createElement("h3");
+    header.textContent = `Week ${weekNumber} – ${date}`;
+    header.style.marginTop = "24px";
+    el.appendChild(header);
 
-    // Build week header
-    const weekHeader = document.createElement("h3");
-    weekHeader.textContent = `Week ${weekNumber} – ${date}`;
-    weekHeader.style.marginTop = "24px";
-    el.appendChild(weekHeader);
-
-    // Optional: show site if all games share it
+    // Show site once if consistent
     const sites = new Set(weekGames.map(g => g.location).filter(Boolean));
     if (sites.size === 1) {
       const siteLine = document.createElement("div");
@@ -141,28 +141,23 @@ function renderSchedule(teamsById, games) {
       el.appendChild(siteLine);
     }
 
-    // Render each game in the week
+    // Games
     for (const g of weekGames) {
       const homeName = teamsById.get(g.homeTeamId) || g.homeTeamId || "TBD";
       const awayName = teamsById.get(g.awayTeamId) || g.awayTeamId || "TBD";
-
-      const played =
-        Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
+      const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
 
       const line = played
         ? `${awayName} ${g.awayScore} — ${homeName} ${g.homeScore}`
         : `${awayName} @ ${homeName}`;
 
-      const metaParts = [g.time].filter(Boolean);
-
       const div = document.createElement("div");
       div.className = "game";
       div.innerHTML = `
-        <div class="meta">${metaParts.join(" • ")}</div>
+        <div class="meta">${g.time || ""}</div>
         <div class="score">${line}</div>
         ${played ? "" : `<div class="pending">Not played yet</div>`}
       `;
-
       el.appendChild(div);
     }
 
@@ -170,6 +165,7 @@ function renderSchedule(teamsById, games) {
   }
 }
 
+// ---------- Playoffs ----------
 function seedFromStandings(standings) {
   return standings.map((t, idx) => ({
     seed: idx + 1,
@@ -185,12 +181,15 @@ function seedFromStandings(standings) {
 
 function renderPlayoffs(seeds) {
   const el = document.getElementById("playoffs");
-  if (!el) return; // if you remove playoffs section from HTML, don’t crash
-const datesEl = document.getElementById("playoffDates");
+  if (!el) return;
+
+  // Set the playoff dates line
+  const datesEl = document.getElementById("playoffDates");
   if (datesEl) {
     datesEl.textContent =
       "Friday 5/1/26 (Play-in Games) • Saturday 5/2/26 — Semifinals 10:30 AM • Championship 12:00 PM";
   }
+
   if (!seeds || seeds.length < 6) {
     el.innerHTML = `
       <div class="game">
@@ -211,19 +210,19 @@ const datesEl = document.getElementById("playoffDates");
     </div>
 
     <div class="game">
-      <div class="meta">Friday Night — Play-in (Tentative)</div>
+      <div class="meta">Friday 5/1/26 — Play-in</div>
       <div class="score">Game A: #3 ${s(3).name} vs #6 ${s(6).name}</div>
       <div class="score">Game B: #4 ${s(4).name} vs #5 ${s(5).name}</div>
     </div>
 
     <div class="game">
-      <div class="meta">Saturday — Semifinals (10:30 AM)</div>
+      <div class="meta">Saturday 5/2/26 — Semifinals (10:30 AM)</div>
       <div class="score">Semi 1: Winner of #4/#5 vs #1 ${s(1).name}</div>
       <div class="score">Semi 2: Winner of #3/#6 vs #2 ${s(2).name}</div>
     </div>
 
     <div class="game">
-      <div class="meta">Saturday — Championship (12:00 PM)</div>
+      <div class="meta">Saturday 5/2/26 — Championship (12:00 PM)</div>
       <div class="score">Championship: Winners of the 10:30 AM semifinals</div>
     </div>
   `;
