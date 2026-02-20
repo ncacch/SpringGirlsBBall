@@ -98,7 +98,6 @@ function renderStandings(rows) {
     tbody.appendChild(tr);
   }
 }
-
 function renderSchedule(teamsById, games) {
   const el = document.getElementById("schedule");
   if (!el) throw new Error("Schedule container not found (#schedule).");
