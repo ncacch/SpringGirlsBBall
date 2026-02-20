@@ -138,7 +138,7 @@ if (sites.size === 1) {
   siteLine.textContent = [...sites][0];
   siteLine.style.fontWeight = "700";
   siteLine.style.fontSize = "1.15rem";
-  siteLine.style.marginBottom = "10px";
+  siteLine.style.marginBottom = "12px";
   el.appendChild(siteLine);
 }
 
