@@ -105,37 +105,69 @@ function renderSchedule(teamsById, games) {
 
   el.innerHTML = "";
 
+  // Sort games by date then time
   const sorted = [...games].sort((a, b) => {
     const da = new Date(`${a.date}T00:00:00`);
     const db = new Date(`${b.date}T00:00:00`);
     return da - db || String(a.time).localeCompare(String(b.time));
   });
 
+  // Group games by date
+  const gamesByDate = {};
   for (const g of sorted) {
-    const homeName = teamsById.get(g.homeTeamId) || g.homeTeamId || "TBD";
-    const awayName = teamsById.get(g.awayTeamId) || g.awayTeamId || "TBD";
+    if (!gamesByDate[g.date]) {
+      gamesByDate[g.date] = [];
+    }
+    gamesByDate[g.date].push(g);
+  }
 
-    const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
+  let weekNumber = 1;
 
-    const line = played
-      ? `${awayName} ${g.awayScore} — ${homeName} ${g.homeScore}`
-      : `${awayName} @ ${homeName}`;
+  for (const date of Object.keys(gamesByDate)) {
+    const weekGames = gamesByDate[date];
 
-    const metaParts = [
-      g.location || null,
-      g.date || null,
-      g.time || null
-    ].filter(Boolean);
+    // Build week header
+    const weekHeader = document.createElement("h3");
+    weekHeader.textContent = `Week ${weekNumber} – ${date}`;
+    weekHeader.style.marginTop = "24px";
+    el.appendChild(weekHeader);
 
-    const div = document.createElement("div");
-    div.className = "game";
-    div.innerHTML = `
-      <div class="meta">${metaParts.join(" • ")}</div>
-      <div class="score">${line}</div>
-      ${played ? "" : `<div class="pending">Not played yet</div>`}
-    `;
+    // Optional: show site if all games share it
+    const sites = new Set(weekGames.map(g => g.location).filter(Boolean));
+    if (sites.size === 1) {
+      const siteLine = document.createElement("div");
+      siteLine.className = "meta";
+      siteLine.textContent = [...sites][0];
+      siteLine.style.marginBottom = "8px";
+      el.appendChild(siteLine);
+    }
 
-    el.appendChild(div);
+    // Render each game in the week
+    for (const g of weekGames) {
+      const homeName = teamsById.get(g.homeTeamId) || g.homeTeamId || "TBD";
+      const awayName = teamsById.get(g.awayTeamId) || g.awayTeamId || "TBD";
+
+      const played =
+        Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
+
+      const line = played
+        ? `${awayName} ${g.awayScore} — ${homeName} ${g.homeScore}`
+        : `${awayName} @ ${homeName}`;
+
+      const metaParts = [g.time].filter(Boolean);
+
+      const div = document.createElement("div");
+      div.className = "game";
+      div.innerHTML = `
+        <div class="meta">${metaParts.join(" • ")}</div>
+        <div class="score">${line}</div>
+        ${played ? "" : `<div class="pending">Not played yet</div>`}
+      `;
+
+      el.appendChild(div);
+    }
+
+    weekNumber += 1;
   }
 }
 
