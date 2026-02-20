@@ -12,3 +12,20 @@ th { background: #fafafa; }
 .meta { color: #666; font-size: 0.9em; margin-bottom: 6px; }
 .score { font-weight: 600; }
 .pending { color: #888; font-style: italic; }
+/* Team color badges */
+.team-badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:700;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+/* Team colors (by teamId) */
+.team-iroquois{ background:#ffd400; color:#000; }          /* yellow / black */
+.team-fusion{ background:#001f5b; color:#fff; }            /* navy / white */
+.team-girard{ background:#c8102e; color:#ffd400; }         /* red / yellow */
+.team-nw{ background:#000; color:#c8102e; }                /* black / red */
+.team-wk{ background:#fff; color:#1f4ed8; border:1px solid #cfcfcf; } /* white / royal blue */
+.team-wj{ background:#1f4ed8; color:#fff; }                /* royal blue / white */
