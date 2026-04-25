@@ -190,69 +190,75 @@ function seedFromStandings(standings) {
 }
 
 function renderPlayoffs(seeds) {
+
   const el = document.getElementById("playoffs");
+
   if (!el) return;
 
-  // Set the playoff dates line
   const datesEl = document.getElementById("playoffDates");
+
   if (datesEl) {
+
     datesEl.textContent =
-      "Friday 5/1/26 (Play-in Games) • Saturday 5/2/26 — Semifinals 10:30 AM • Championship 12:00 PM";
+
+      "All playoff games at Girard / Rice Avenue Middle School";
+
   }
 
   if (!seeds || seeds.length < 6) {
+
     el.innerHTML = `
+
       <div class="game">
+
         <div class="pending">Playoffs will appear once 6 teams are loaded.</div>
+
       </div>
+
     `;
+
     return;
+
   }
 
   const s = (n) => seeds[n - 1];
 
   el.innerHTML = `
+
     <div class="game">
-      <div class="meta">Seeding (based on current standings)</div>
-      <div class="score">
-        ${seeds.map(x => `#${x.seed} ${x.name}`).join("<br/>")}
-      </div>
+
+      <div class="meta">Friday 5/1/26 — Play-in Games</div>
+
+      <div class="score">6:00 PM — Game A: #3 ${s(3).name} vs #6 ${s(6).name}</div>
+
+      <div class="score">7:00 PM — Game B: #4 ${s(4).name} vs #5 ${s(5).name}</div>
+
+      <div class="note">Location: Girard / Rice Avenue Middle School</div>
+
     </div>
 
     <div class="game">
-      <div class="meta">Friday 5/1/26 — Play-in</div>
-      <div class="score">Game A: #3 ${s(3).name} vs #6 ${s(6).name}</div>
-      <div class="score">Game B: #4 ${s(4).name} vs #5 ${s(5).name}</div>
+
+      <div class="meta">Saturday 5/2/26 — Semifinals</div>
+
+      <div class="score">10:00 AM — Semi 1: Winner of #4/#5 vs #1 ${s(1).name}</div>
+
+      <div class="score">11:00 AM — Semi 2: Winner of #3/#6 vs #2 ${s(2).name}</div>
+
+      <div class="note">Location: Girard / Rice Avenue Middle School</div>
+
     </div>
 
     <div class="game">
-      <div class="meta">Saturday 5/2/26 — Semifinals (10:30 AM)</div>
-      <div class="score">Semi 1: Winner of #4/#5 vs #1 ${s(1).name}</div>
-      <div class="score">Semi 2: Winner of #3/#6 vs #2 ${s(2).name}</div>
+
+      <div class="meta">Saturday 5/2/26 — Championship</div>
+
+      <div class="score">12:15 PM — Winner of Semi 1 vs Winner of Semi 2</div>
+
+      <div class="note">Location: Girard / Rice Avenue Middle School</div>
+
     </div>
 
-    <div class="game">
-      <div class="meta">Saturday 5/2/26 — Championship (12:00 PM)</div>
-      <div class="score">Championship: Winners of the 10:30 AM semifinals</div>
-    </div>
   `;
+
 }
-
-// ---------- Main ----------
-async function main() {
-  const [teams, games] = await Promise.all([
-    loadJson("teams.json"),
-    loadJson("games.json")
-  ]);
-
-  const teamsById = new Map(teams.map(t => [t.id, t.name]));
-  const standings = computeStandings(teams, games);
-
-  renderStandings(standings);
-  renderSchedule(teamsById, games);
-
-  const seeds = seedFromStandings(standings);
-  renderPlayoffs(seeds);
-}
-
-main();
