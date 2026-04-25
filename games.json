@@ -15,7 +15,7 @@
   { "id": 11, "date": "2026-04-18", "time": "11:00 AM", "location": "Northwestern", "homeTeamId": "nw", "awayTeamId": "fusion", "homeScore": 25, "awayScore": 9 },
   { "id": 12, "date": "2026-04-18", "time": "12:00 PM", "location": "Northwestern", "homeTeamId": "iroquois", "awayTeamId": "wj", "homeScore": 13, "awayScore": 20 },
 
-  { "id": 15, "date": "2026-04-25", "time": "10:00 AM", "location": "Iroquois", "homeTeamId": "girard", "awayTeamId": "wj", "homeScore": null, "awayScore": null },
-  { "id": 13, "date": "2026-04-25", "time": "11:00 AM", "location": "Iroquois", "homeTeamId": "wk", "awayTeamId": "fusion", "homeScore": null, "awayScore": null },
-  { "id": 14, "date": "2026-04-25", "time": "12:00 PM", "location": "Iroquois", "homeTeamId": "wk", "awayTeamId": "iroquois", "homeScore": null, "awayScore": null }
+  { "id": 15, "date": "2026-04-25", "time": "10:00 AM", "location": "Iroquois", "homeTeamId": "girard", "awayTeamId": "wj", "homeScore": 10, "awayScore": 22 },
+  { "id": 13, "date": "2026-04-25", "time": "11:00 AM", "location": "Iroquois", "homeTeamId": "wk", "awayTeamId": "fusion", "homeScore": 22, "awayScore": 14 },
+  { "id": 14, "date": "2026-04-25", "time": "12:00 PM", "location": "Iroquois", "homeTeamId": "wk", "awayTeamId": "iroquois", "homeScore": 17, "awayScore": 12 }
 ]
