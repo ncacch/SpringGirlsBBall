@@ -1,4 +1,3 @@
-// ---------- Visible error banners (helps debugging on mobile) ----------
 window.addEventListener("error", (e) => {
   document.body.insertAdjacentHTML(
     "afterbegin",
@@ -17,7 +16,6 @@ window.addEventListener("unhandledrejection", (e) => {
   );
 });
 
-// ---------- Helpers ----------
 async function loadJson(path) {
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
@@ -33,7 +31,6 @@ function teamBadge(teamId, teamName) {
 function computeStandings(teams, games) {
   const map = new Map();
 
-  // Initialize every team
   for (const t of teams) {
     map.set(t.id, {
       teamId: t.id,
@@ -45,20 +42,16 @@ function computeStandings(teams, games) {
     });
   }
 
-  // Apply completed games
   for (const g of games) {
     const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
     if (!played) continue;
 
     const home = map.get(g.homeTeamId);
     const away = map.get(g.awayTeamId);
-
-    // If a game references an unknown teamId, skip it (prevents crashing)
     if (!home || !away) continue;
 
     home.pf += g.homeScore;
     home.pa += g.awayScore;
-
     away.pf += g.awayScore;
     away.pa += g.homeScore;
 
@@ -71,9 +64,7 @@ function computeStandings(teams, games) {
     }
   }
 
-  // Sort: wins desc, diff desc, PF desc, name asc
-  const rows = [...map.values()];
-  rows.sort((a, b) => {
+  return [...map.values()].sort((a, b) => {
     const diffA = a.pf - a.pa;
     const diffB = b.pf - b.pa;
     return (
@@ -83,18 +74,18 @@ function computeStandings(teams, games) {
       a.name.localeCompare(b.name)
     );
   });
-
-  return rows;
 }
 
 function renderStandings(rows) {
   const tbody = document.querySelector("#standingsTable tbody");
-  if (!tbody) throw new Error("Standings table body not found (#standingsTable tbody).");
+  if (!tbody) throw new Error("Standings table body not found.");
 
   tbody.innerHTML = "";
+
   for (const r of rows) {
     const diff = r.pf - r.pa;
     const tr = document.createElement("tr");
+
     tr.innerHTML = `
       <td>${teamBadge(r.teamId, r.name)}</td>
       <td>${r.wins}</td>
@@ -103,26 +94,25 @@ function renderStandings(rows) {
       <td>${r.pa}</td>
       <td>${diff}</td>
     `;
+
     tbody.appendChild(tr);
   }
 }
 
-// ---------- Schedule (grouped by week/date) ----------
 function renderSchedule(teamsById, games) {
   const el = document.getElementById("schedule");
-  if (!el) throw new Error("Schedule container not found (#schedule).");
+  if (!el) throw new Error("Schedule container not found.");
 
   el.innerHTML = "";
 
-  // Sort by date then time
   const sorted = [...games].sort((a, b) => {
     const da = new Date(`${a.date}T00:00:00`);
     const db = new Date(`${b.date}T00:00:00`);
     return da - db || String(a.time).localeCompare(String(b.time));
   });
 
-  // Group by date
   const gamesByDate = new Map();
+
   for (const g of sorted) {
     if (!gamesByDate.has(g.date)) gamesByDate.set(g.date, []);
     gamesByDate.get(g.date).push(g);
@@ -131,43 +121,45 @@ function renderSchedule(teamsById, games) {
   let weekNumber = 1;
 
   for (const [date, weekGames] of gamesByDate.entries()) {
-    // Week header
     const header = document.createElement("h3");
     header.textContent = `Week ${weekNumber} – ${date}`;
     header.style.marginTop = "24px";
     el.appendChild(header);
 
-// Show site once if consistent (BOLD + LARGE)
-const sites = new Set(weekGames.map(g => g.location).filter(Boolean));
-if (sites.size === 1) {
-  const siteLine = document.createElement("div");
-  siteLine.textContent = [...sites][0];
-  siteLine.style.fontWeight = "700";
-  siteLine.style.fontSize = "1.15rem";
-  siteLine.style.marginBottom = "12px";
-  el.appendChild(siteLine);
-}
+    const sites = new Set(weekGames.map(g => g.location).filter(Boolean));
 
-    // Games
+    if (sites.size === 1) {
+      const siteLine = document.createElement("div");
+      siteLine.textContent = [...sites][0];
+      siteLine.style.fontWeight = "700";
+      siteLine.style.fontSize = "1.25rem";
+      siteLine.style.marginBottom = "12px";
+      el.appendChild(siteLine);
+    }
+
     for (const g of weekGames) {
       const homeName = teamsById.get(g.homeTeamId) || g.homeTeamId || "TBD";
       const awayName = teamsById.get(g.awayTeamId) || g.awayTeamId || "TBD";
+
+      const homeBadge = teamBadge(g.homeTeamId, homeName);
+      const awayBadge = teamBadge(g.awayTeamId, awayName);
+
       const played = Number.isFinite(g.homeScore) && Number.isFinite(g.awayScore);
 
-     const awayBadge = teamBadge(g.awayTeamId, awayName);
-const homeBadge = teamBadge(g.homeTeamId, homeName);
-
-const line = played
-  ? `${awayBadge} ${g.awayScore} — ${homeBadge} ${g.homeScore}`
-  : `${awayBadge} @ ${homeBadge}`;
+      const line = played
+        ? `${awayBadge} ${g.awayScore} — ${homeBadge} ${g.homeScore}`
+        : `${awayBadge} @ ${homeBadge}`;
 
       const div = document.createElement("div");
       div.className = "game";
+
       div.innerHTML = `
         <div class="meta">${g.time || ""}</div>
         <div class="score">${line}</div>
+        ${g.note ? `<div class="note">${g.note}</div>` : ""}
         ${played ? "" : `<div class="pending">Not played yet</div>`}
       `;
+
       el.appendChild(div);
     }
 
@@ -175,7 +167,6 @@ const line = played
   }
 }
 
-// ---------- Playoffs ----------
 function seedFromStandings(standings) {
   return standings.map((t, idx) => ({
     seed: idx + 1,
@@ -190,75 +181,59 @@ function seedFromStandings(standings) {
 }
 
 function renderPlayoffs(seeds) {
-
   const el = document.getElementById("playoffs");
-
   if (!el) return;
 
   const datesEl = document.getElementById("playoffDates");
-
   if (datesEl) {
-
-    datesEl.textContent =
-
-      "All playoff games at Girard / Rice Avenue Middle School";
-
+    datesEl.textContent = "All playoff games at Girard / Rice Avenue Middle School";
   }
 
   if (!seeds || seeds.length < 6) {
-
     el.innerHTML = `
-
       <div class="game">
-
         <div class="pending">Playoffs will appear once 6 teams are loaded.</div>
-
       </div>
-
     `;
-
     return;
-
   }
 
   const s = (n) => seeds[n - 1];
 
   el.innerHTML = `
-
     <div class="game">
-
       <div class="meta">Friday 5/1/26 — Play-in Games</div>
-
-      <div class="score">6:00 PM — Game A: #3 ${s(3).name} vs #6 ${s(6).name}</div>
-
-      <div class="score">7:00 PM — Game B: #4 ${s(4).name} vs #5 ${s(5).name}</div>
-
-      <div class="note">Location: Girard / Rice Avenue Middle School</div>
-
+      <div class="score">6:00 PM — Game A: #3 ${teamBadge(s(3).teamId, s(3).name)} vs #6 ${teamBadge(s(6).teamId, s(6).name)}</div>
+      <div class="score">7:00 PM — Game B: #4 ${teamBadge(s(4).teamId, s(4).name)} vs #5 ${teamBadge(s(5).teamId, s(5).name)}</div>
     </div>
 
     <div class="game">
-
       <div class="meta">Saturday 5/2/26 — Semifinals</div>
-
-      <div class="score">10:00 AM — Semi 1: Winner of #4/#5 vs #1 ${s(1).name}</div>
-
-      <div class="score">11:00 AM — Semi 2: Winner of #3/#6 vs #2 ${s(2).name}</div>
-
-      <div class="note">Location: Girard / Rice Avenue Middle School</div>
-
+      <div class="score">10:00 AM — Semi 1: Winner of #4/#5 vs #1 ${teamBadge(s(1).teamId, s(1).name)}</div>
+      <div class="score">11:00 AM — Semi 2: Winner of #3/#6 vs #2 ${teamBadge(s(2).teamId, s(2).name)}</div>
     </div>
 
     <div class="game">
-
       <div class="meta">Saturday 5/2/26 — Championship</div>
-
       <div class="score">12:15 PM — Winner of Semi 1 vs Winner of Semi 2</div>
-
-      <div class="note">Location: Girard / Rice Avenue Middle School</div>
-
     </div>
-
   `;
-
 }
+
+async function main() {
+  const [teams, games] = await Promise.all([
+    loadJson("teams.json"),
+    loadJson("games.json")
+  ]);
+
+  const teamsById = new Map(teams.map(t => [t.id, t.name]));
+  const standings = computeStandings(teams, games);
+
+  renderStandings(standings);
+  renderSchedule(teamsById, games);
+
+  const seeds = seedFromStandings(standings);
+  renderPlayoffs(seeds);
+}
+
+main();
