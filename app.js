@@ -209,7 +209,7 @@ function renderPlayoffs(seeds) {
     <div class="game">
       <div class="meta">Saturday 5/2/26 — Semifinals</div>
       <div class="score">10:00 AM — Semi 1: Winner of #4/#5 vs #1 ${teamBadge(s(1).teamId, s(1).name)}</div>
-      <div class="score">11:00 AM — Semi 2: Winner of #3/#6 vs #2 ${teamBadge(s(2).teamId, s(2).name)}</div>
+<div class="score">11:00 AM — Semi 2: Winner of #3/#6 vs #2 ${teamBadge(s(2).teamId, s(2).name)}</div>
     </div>
 
     <div class="game">
