@@ -203,9 +203,8 @@ function renderPlayoffs(seeds) {
   el.innerHTML = `
     <div class="game">
       <div class="meta">Friday 5/1/26 — Play-in Games</div>
-      <div class="score">6:00 PM — Game A: #3 ${teamBadge(s(3).teamId, s(3).name)} vs #6 ${teamBadge(s(6).teamId, s(6).name)}</div>
-      <div class="score">7:00 PM — Game B: #4 ${teamBadge(s(4).teamId, s(4).name)} vs #5 ${teamBadge(s(5).teamId, s(5).name)}</div>
-    </div>
+      <div class="score">6:00 PM — Game A: #3 ${teamBadge(s(3).teamId, s(3).name)} 21 — #6 ${teamBadge(s(6).teamId, s(6).name)} 17</div>
+    <div class="score">7:00 PM — Game B: #4 ${teamBadge(s(4).teamId, s(4).name)} 12 — #5 ${teamBadge(s(5).teamId, s(5).name)} 14</div>
 
     <div class="game">
       <div class="meta">Saturday 5/2/26 — Semifinals</div>
