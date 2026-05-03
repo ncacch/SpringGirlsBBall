@@ -189,14 +189,7 @@ function renderPlayoffs(seeds) {
     datesEl.textContent = "All playoff games at Girard / Rice Avenue Middle School";
   }
 
-  if (!seeds || seeds.length < 6) {
-    el.innerHTML = `
-      <div class="game">
-        <div class="pending">Playoffs will appear once 6 teams are loaded.</div>
-      </div>
-    `;
-    return;
-  }
+  if (!seeds || seeds.length < 6) return;
 
   const s = (n) => seeds[n - 1];
 
@@ -209,17 +202,16 @@ function renderPlayoffs(seeds) {
 
     <div class="game">
       <div class="meta">Saturday 5/2/26 — Semifinals</div>
-      <div class="score">10:00 AM — Semi 1: #5 ${teamBadge("fusion", "Millcreek Fusion")} vs #1 ${teamBadge(s(1).teamId, s(1).name)}</div>
-      <div class="score">11:00 AM — Semi 2: #3 ${teamBadge("wk", "Wattsburg-Kinzig")} vs #2 ${teamBadge(s(2).teamId, s(2).name)}</div>
+      <div class="score">10:00 AM — Semi 1: #5 ${teamBadge("fusion", "Millcreek Fusion")} 18 — #1 ${teamBadge("nw", "Northwestern")} 23</div>
+      <div class="score">11:00 AM — Semi 2: #2 ${teamBadge("wj", "Wattsburg-Jefferson")} 12 — #3 ${teamBadge("wk", "Wattsburg-Kinzig")} 4</div>
     </div>
 
     <div class="game">
       <div class="meta">Saturday 5/2/26 — Championship</div>
-      <div class="score">12:15 PM — Winner of Semi 1 vs Winner of Semi 2</div>
+      <div class="score">12:15 PM — #2 ${teamBadge("wj", "Wattsburg-Jefferson")} 17 — #1 ${teamBadge("nw", "Northwestern")} 15</div>
     </div>
   `;
 }
-
 async function main() {
   const [teams, games] = await Promise.all([
     loadJson("teams.json"),
